@@ -19,7 +19,7 @@ common warnings
 executable advent-of-code2023
     import:           warnings
     main-is:          Main.hs
-    -- other-modules:
+    other-modules:    Day1
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0, megaparsec
     hs-source-dirs:   app
