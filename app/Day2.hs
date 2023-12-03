@@ -21,23 +21,6 @@ execute = do
       Right n -> n
 
 -- Part 1
-pGame :: Parser Int
-pGame = do
-  gids <- string "Game " *> some numberChar <* char ':'
-  let gid = read gids :: Int
-  rounds <- join <$> some pRound
-  let (b, r, g) =
-        foldl
-          ( \(a1, a2, a3) el -> case el of
-              Blue n -> (n <= 14 && a1, a2, a3)
-              Red n -> (a1, a2 && n <= 12, a3)
-              Green n -> (a1, a2, a3 && n <= 13)
-          )
-          (True, True, True)
-          rounds
-  let num = if b && r && g then gid else 0
-  return $ trace (show gid ++ ": " ++ show num) num
-
 -- pGame :: Parser Int
 -- pGame = do
 --   gids <- string "Game " *> some numberChar <* char ':'
@@ -46,14 +29,31 @@ pGame = do
 --   let (b, r, g) =
 --         foldl
 --           ( \(a1, a2, a3) el -> case el of
---               Blue n -> (a1 + n, a2, a3)
---               Red n -> (a1, a2 + n, a3)
---               Green n -> (a1, a2, a3 + n)
+--               Blue n -> (n <= 14 && a1, a2, a3)
+--               Red n -> (a1, a2 && n <= 12, a3)
+--               Green n -> (a1, a2, a3 && n <= 13)
 --           )
---           (0, 0, 0)
+--           (True, True, True)
 --           rounds
---   let num = if b <= 14 && r <= 12 && g <= 13 then gid else 0
+--   let num = if b && r && g then gid else 0
 --   return $ trace (show gid ++ ": " ++ show num) num
+
+-- Part 2
+pGame :: Parser Int
+pGame = do
+  gids <- string "Game " *> some numberChar <* char ':'
+  let gid = read gids :: Int
+  rounds <- join <$> some pRound
+  let (b, r, g) =
+        foldl
+          ( \(a1, a2, a3) el -> case el of
+              Blue n -> (max a1 n, a2, a3)
+              Red n -> (a1, max a2 n, a3)
+              Green n -> (a1, a2, max a3 n)
+          )
+          (0, 0, 0)
+          rounds
+  return $ trace (show gid ++ ": " ++ show (b * r * g)) b * r * g
 
 pRound :: Parser [Color]
 pRound =
