@@ -15,7 +15,7 @@ main =
     -- doDay 4 Day4.execute
     doDay 5 Day5.execute
   where
-    doDay :: Int -> IO Int -> IO ()
+    doDay :: Int -> IO (Int, Int) -> IO ()
     doDay n day = do
       putStrLn "--------"
       putStrLn $ "Day " ++ show n
