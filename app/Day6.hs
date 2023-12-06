@@ -16,10 +16,9 @@ execute = do
 
 part1 :: [(Int, Int)] -> Int
 part1 = foldl (\acc (time, distance) -> acc * findNumWinners time distance) 1
-  where
-    findNumWinners time distance = (length . filter (> distance)) [s * (time - s) | s <- [1 .. time]]
 
 part2 :: Int -> Int -> Int
 part2 = findNumWinners
-  where
-    findNumWinners time distance = (length . filter (> distance)) [s * (time - s) | s <- [1 .. time]]
+
+findNumWinners :: Int -> Int -> Int
+findNumWinners time distance = (length . filter (> distance)) [s * (time - s) | s <- [1 .. time]]
