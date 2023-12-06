@@ -5,7 +5,6 @@ module Day5 where
 import Control.Arrow ((&&&))
 import Data.List
 import Data.List.Split
-import Debug.Trace
 import System.IO
 
 execute :: IO (Int, Int)
