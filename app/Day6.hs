@@ -7,16 +7,19 @@ execute :: IO (Int, Int)
 execute = do
   file <- openFile "app/inputs/day6.txt" ReadMode
   ll <- lines <$> hGetContents file
-  let races = zip (parse . head $ ll) (parse . last $ ll)
-  return $ (part1 &&& part2) races
+  let races = zip (parseForPart1 . head $ ll) (parseForPart1 . last $ ll)
+  let (time, distance) = ((parseForPart2 . head) &&& (parseForPart2 . last)) ll
+  return (part1 races, part2 time distance)
   where
-    parse = map read . drop 1 . words
+    parseForPart1 = map read . drop 1 . words
+    parseForPart2 = read . concat . drop 1 . words
 
 part1 :: [(Int, Int)] -> Int
 part1 = foldl (\acc (time, distance) -> acc * findNumWinners time distance) 1
   where
     findNumWinners time distance = (length . filter (> distance)) [s * (time - s) | s <- [1 .. time]]
 
-part2 :: [(Int, Int)] -> Int
-part2 races =
-  0
+part2 :: Int -> Int -> Int
+part2 = findNumWinners
+  where
+    findNumWinners time distance = (length . filter (> distance)) [s * (time - s) | s <- [1 .. time]]
