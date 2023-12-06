@@ -15,7 +15,7 @@ execute = do
     parseForPart2 = read . concat . drop 1 . words
 
 part1 :: [(Int, Int)] -> Int
-part1 = foldl (\acc (time, distance) -> acc * findNumWinners time distance) 1
+part1 = product . map (uncurry findNumWinners)
 
 part2 :: Int -> Int -> Int
 part2 = findNumWinners
