@@ -30,7 +30,7 @@ part2 input = do
 findLocation :: Int -> [[(Int, Int, Int)]] -> Int
 findLocation = foldl doMap
   where
-    doMap acc m = maybe acc (\(s, d, _) -> d + (acc - s)) $ find (\(s, _, c) -> s < acc && s + c > acc) m
+    doMap acc m = maybe acc (\(s, d, _) -> d + (acc - s)) $ find (\(s, _, c) -> s <= acc && s + c > acc) m
 
 xToYMap :: [String] -> [(Int, Int, Int)]
 xToYMap = map (tuple3 . (map read . words)) . drop 1
