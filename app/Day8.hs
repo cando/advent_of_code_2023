@@ -2,6 +2,7 @@ module Day8 where
 
 import Control.Arrow ((&&&))
 import Control.Monad (foldM)
+import Data.Either (fromLeft)
 import Data.List (isSuffixOf)
 import Data.Map qualified as M
 import Data.Maybe (fromJust)
@@ -35,16 +36,37 @@ parseForPart1 = (cycle . head) &&& parseGraph
 part2 :: (String, M.Map String (String, String)) -> Int
 part2 (directions, graph) =
   let endingsA = filter (isSuffixOf "A") $ M.keys graph
-   in length $
-        takeWhile (not . all (isSuffixOf "Z")) $
-          scanl
-            ( \nodes dir ->
-                map
-                  ( \node ->
-                      let curNode = fromJust $ M.lookup node graph
-                       in if dir == 'L' then fst curNode else snd curNode
-                  )
-                  nodes
-            )
-            endingsA
-            directions
+      go =
+        foldM
+          ( \(nodes, countTot) dir ->
+              let newNodes =
+                    map
+                      ( \node ->
+                          let curNode = fromJust $ M.lookup node graph
+                           in if dir == 'L' then fst curNode else snd curNode
+                      )
+                      nodes
+               in if all (isSuffixOf "Z") newNodes then Left (newNodes, countTot + 1) else Right (newNodes, countTot + 1)
+          )
+          (endingsA, 0)
+          directions
+   in case go of
+        Left (_, c) -> c
+        Right _ -> error "uf"
+
+-- part2 :: (String, M.Map String (String, String)) -> Int
+-- part2 (directions, graph) =
+--   let endingsA = filter (isSuffixOf "A") $ M.keys graph
+--    in length $
+--         takeWhile (not . all (isSuffixOf "Z")) $
+--           scanl
+--             ( \nodes dir ->
+--                 map
+--                   ( \node ->
+--                       let curNode = fromJust $ M.lookup node graph
+--                        in if dir == 'L' then fst curNode else snd curNode
+--                   )
+--                   nodes
+--             )
+--             endingsA
+--             directions
