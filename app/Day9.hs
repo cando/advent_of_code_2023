@@ -31,7 +31,7 @@ part2 = sum . map (\l -> go2 [l] l)
 
 go2 :: [[Int]] -> [Int] -> Int
 go2 acc inp
-  | all (== 0) inp = sum (zipWith (\i v -> (if odd i then -1 * v else v)) [0 ..] (map head acc))
+  | all (== 0) inp = sum (zipWith (\(i :: Int) v -> (if odd i then -1 * v else v)) [0 ..] (map head acc))
   | otherwise =
       let solved = solveSingle (toPairs inp)
        in go2 (acc ++ [solved]) solved
