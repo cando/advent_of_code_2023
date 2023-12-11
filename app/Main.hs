@@ -4,7 +4,7 @@ module Main where
 -- import Day2 qualified
 -- import Day3 qualified
 -- import Day4 qualified
-import Day8 qualified
+import Day9 qualified
 
 main :: IO ()
 main =
@@ -13,7 +13,7 @@ main =
     -- doDay 2 Day2.execute
     -- doDay 3 Day3.execute
     -- doDay 4 Day4.execute
-    doDay 8 Day8.execute
+    doDay 9 Day9.execute
   where
     doDay :: Int -> IO (Int, Int) -> IO ()
     doDay n day = do

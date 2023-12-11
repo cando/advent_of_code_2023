@@ -19,22 +19,22 @@ common warnings
 executable advent-of-code2023
     import:           warnings
     main-is:          Main.hs
-    other-modules:    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8
+    other-modules:    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0, megaparsec, matrix, containers, extra, split, deepseq
     hs-source-dirs:   app
     default-language: GHC2021
 
-executable advent-of-code2023-profiling
-    import:           warnings
-    main-is:          Main.hs
-    other-modules:    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8
-    -- other-extensions:
-    build-depends:    base ^>=4.17.2.0, megaparsec, matrix, containers, extra, split
-    hs-source-dirs:   app
-    default-language: GHC2021
-    ghc-options:
-        -O2
-        -threaded
-        -fprof-auto
-        "-with-rtsopts=-N -p -s -hc"
+-- executable advent-of-code2023-profiling
+--     import:           warnings
+--     main-is:          Main.hs
+--     other-modules:    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8
+--     -- other-extensions:
+--     build-depends:    base ^>=4.17.2.0, megaparsec, matrix, containers, extra, split
+--     hs-source-dirs:   app
+--     default-language: GHC2021
+--     ghc-options:
+--         -O2
+--         -threaded
+--         -fprof-auto
+--         "-with-rtsopts=-N -p -s -hc"
