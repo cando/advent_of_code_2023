@@ -1,10 +1,12 @@
+{-# LANGUAGE BangPatterns #-}
+
 module Day8 where
 
 import Control.Arrow ((&&&))
-import Control.Monad (foldM)
-import Data.Either (fromLeft)
+import Control.DeepSeq (force)
+import Data.Foldable
 import Data.List (isSuffixOf)
-import Data.Map qualified as M
+import Data.Map.Strict qualified as M
 import Data.Maybe (fromJust)
 import Data.Void
 import Debug.Trace
@@ -19,7 +21,7 @@ execute = do
   file <- openFile "app/inputs/day8.txt" ReadMode
   ll <- lines <$> hGetContents file
   let input = parseForPart1 ll
-  return (part2 input, 0)
+  return (part2lcm input, 0)
 
 parseForPart1 :: [String] -> (String, M.Map String (String, String))
 parseForPart1 = (cycle . head) &&& parseGraph
@@ -33,40 +35,41 @@ parseForPart1 = (cycle . head) &&& parseGraph
       right <- count 3 anySingle <* string ")"
       return (key, (left, right))
 
-part2 :: (String, M.Map String (String, String)) -> Int
-part2 (directions, graph) =
-  let endingsA = filter (isSuffixOf "A") $ M.keys graph
-      go =
-        foldM
-          ( \(nodes, countTot) dir ->
+part2BruteForce :: (String, M.Map String (String, String)) -> Int
+part2BruteForce (directions, graph) =
+  let endingsA = filter (isSuffixOf "A") $! M.keys graph
+      (_, fCount) =
+        foldl'
+          ( \(nodes, !countTot) !dir ->
               let newNodes =
-                    map
-                      ( \node ->
-                          let curNode = fromJust $ M.lookup node graph
-                           in if dir == 'L' then fst curNode else snd curNode
-                      )
-                      nodes
-               in if all (isSuffixOf "Z") newNodes then Left (newNodes, countTot + 1) else Right (newNodes, countTot + 1)
+                    force $
+                      map
+                        ( \node ->
+                            let curNode = graph M.! node
+                             in if dir == 'L' then fst curNode else snd curNode
+                        )
+                        nodes
+               in if all (isSuffixOf "Z") newNodes then error (show $ countTot + 1) else (newNodes, trace (show $ countTot + 1) (countTot + 1))
           )
           (endingsA, 0)
           directions
-   in case go of
-        Left (_, c) -> c
-        Right _ -> error "uf"
+   in fCount
 
--- part2 :: (String, M.Map String (String, String)) -> Int
--- part2 (directions, graph) =
---   let endingsA = filter (isSuffixOf "A") $ M.keys graph
---    in length $
---         takeWhile (not . all (isSuffixOf "Z")) $
---           scanl
---             ( \nodes dir ->
---                 map
---                   ( \node ->
---                       let curNode = fromJust $ M.lookup node graph
---                        in if dir == 'L' then fst curNode else snd curNode
---                   )
---                   nodes
---             )
---             endingsA
---             directions
+part2lcm :: (String, M.Map String (String, String)) -> Int
+part2lcm (directions, graph) =
+  let endingsA = filter (isSuffixOf "A") $ M.keys graph
+      go =
+        map
+          ( \n ->
+              length $
+                takeWhile (not . isSuffixOf "Z") $
+                  scanl
+                    ( \node dir ->
+                        let curNode = fromJust $ M.lookup node graph
+                         in if dir == 'L' then fst curNode else snd curNode
+                    )
+                    n
+                    directions
+          )
+          endingsA
+   in foldl' lcm 1 go
