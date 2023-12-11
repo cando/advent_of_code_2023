@@ -1,11 +1,11 @@
-module Day9 where
+module Day10 where
 
 import Data.List.Extra
 import System.IO
 
 execute :: IO (Int, Int)
 execute = do
-  file <- openFile "app/inputs/day9.txt" ReadMode
+  file <- openFile "app/inputs/day10.txt" ReadMode
   measures <- map (map read . words) . lines <$> hGetContents file
   return (part1 measures, part2 measures)
 

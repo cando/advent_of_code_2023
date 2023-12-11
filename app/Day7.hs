@@ -37,9 +37,11 @@ handType cards =
     [1, 1, 1, 1, 1] -> HighCard cards
     _ -> undefined
 
+toTuple :: [b] -> (b, b)
 toTuple [hand, bid] = (hand, bid)
 toTuple _ = error "input error"
 
+toCard :: Char -> Card
 toCard 'A' = A
 toCard 'K' = K
 toCard 'Q' = Q
