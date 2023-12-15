@@ -1,36 +1,49 @@
 module Day12 where
 
-import Data.List.Extra
+import Control.Arrow ((&&&))
+import Data.Bifunctor (second)
+import Data.List (group)
+import Data.List.Extra (splitOn)
 import System.IO
 
 execute :: IO (Int, Int)
 execute = do
-  file <- openFile "app/inputs/day9.txt" ReadMode
-  measures <- map (map read . words) . lines <$> hGetContents file
+  file <- openFile "app/inputs/day12.txt" ReadMode
+  measures <- map (second (map read . splitOn ",") . (head &&& last) . words) . lines <$> hGetContents file
   return (part1 measures, part2 measures)
 
-part1 :: [[Int]] -> Int
-part1 = sum . map (\l -> go1 [l] l)
+part1 :: [(String, [Int])] -> Int
+part1 = sum . map (\(s, i) -> countSolutions i s)
 
-solveSingle :: [(Int, Int)] -> [Int]
-solveSingle = foldl' (\acc (a, b) -> acc ++ [b - a]) []
+countSolutions :: [Int] -> [Char] -> Int
+countSolutions groups input = length $ filter (isValid groups) $ generateSolutions input "" []
 
-toPairs :: [Int] -> [(Int, Int)]
-toPairs inp = zip inp (drop 1 inp)
+isValid :: [Int] -> String -> Bool
+isValid [] _ = True
+isValid i s = i == (map length . filter (all (== '#')) . group) s
 
-go1 :: [[Int]] -> [Int] -> Int
-go1 acc inp
-  | all (== 0) inp = sum (map last acc)
-  | otherwise =
-      let solved = solveSingle (toPairs inp)
-       in go1 (acc ++ [solved]) solved
+generateSolutions :: [Char] -> [Char] -> [[Char]] -> [[Char]]
+generateSolutions [] s acc = acc ++ [s]
+generateSolutions ('?' : xs) s acc = generateSolutions xs (s ++ ['#']) acc ++ generateSolutions xs (s ++ ['.']) acc
+generateSolutions (c : xs) s acc = generateSolutions xs (s ++ [c]) acc
 
-part2 :: [[Int]] -> Int
-part2 = sum . map (\l -> go2 [l] l)
+valid :: [Int] -> [Char] -> Int -> Int
+valid (1 : ixs) ('?' : '.' : sxs) acc = valid ixs sxs (acc + 1)
+valid (1 : ixs) ('.' : '?' : sxs) acc = valid ixs sxs (acc + 1)
+valid (1 : ixs) ('?' : '?' : sxs) acc = valid ixs sxs (acc + 1)
+valid (1 : ixs) ('#' : _ : sxs) acc = valid ixs sxs acc
+valid (1 : ixs) (_ : '#' : sxs) acc = valid ixs sxs acc
+valid (2 : ixs) ('?' : '?' : '.' : sxs) acc = valid ixs sxs (acc + 1)
+valid (2 : ixs) ('.' : '?' : '?' : sxs) acc = valid ixs sxs (acc + 1)
+valid (2 : ixs) ('#' : '?' : '?' : sxs) acc = valid ixs sxs (acc + 1)
+valid (2 : ixs) ('#' : '?' : '.' : sxs) acc = valid ixs sxs (acc + 1)
+valid (2 : ixs) ('?' : '#' : '.' : sxs) acc = valid ixs sxs (acc + 1)
+valid (2 : ixs) ('#' : '#' : '.' : sxs) acc = valid ixs sxs acc
+valid (2 : ixs) ('#' : '#' : '?' : sxs) acc = valid ixs sxs acc
+valid (2 : ixs) ('.' : '#' : '#' : '.' : sxs) acc = valid ixs sxs acc
+valid (2 : ixs) ('?' : '#' : '#' : '?' : sxs) acc = valid ixs sxs acc
+valid [] _ acc = acc
+valid _ _ _ = undefined
 
-go2 :: [[Int]] -> [Int] -> Int
-go2 acc inp
-  | all (== 0) inp = sum (zipWith (\(i :: Int) v -> (if odd i then -1 * v else v)) [0 ..] (map head acc))
-  | otherwise =
-      let solved = solveSingle (toPairs inp)
-       in go2 (acc ++ [solved]) solved
+part2 :: [(String, [Int])] -> Int
+part2 _ = 0

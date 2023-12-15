@@ -13,7 +13,7 @@ main =
     -- doDay 2 Day2.execute
     -- doDay 3 Day3.execute
     -- doDay 4 Day4.execute
-    doDay 10 Day12.execute
+    doDay 12 Day12.execute
   where
     doDay :: Int -> IO (Int, Int) -> IO ()
     doDay n day = do
